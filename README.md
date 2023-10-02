@@ -1,1 +1,1 @@
-"# UoB-GoS-Autumn-Election-Tracker" 
+# UoB-GoS-Autumn-Election-Tracker
