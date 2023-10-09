@@ -1,7 +1,9 @@
 import sqlite3
+import traceback
+import sys
 import os
 
-def put_specific_data_into_db(dataset, table_name, date_generated, cur):
+def put_specific_data_into_db(dataset, table_name, date_generated, cur, conn):
     cur.execute("SELECT name FROM " + table_name)
     deps_in_db = [dep[0] for dep in cur.fetchall()]
 
@@ -18,16 +20,28 @@ def put_specific_data_into_db(dataset, table_name, date_generated, cur):
             print("[INFO] Inserting " + dep + " into database...")
             command = "UPDATE " + table_name + " SET votes = " + str(deps[dep][0]) + ", eligible = " + str(deps[dep][1]) + ", date_generated = '" + date_generated + "' WHERE name = '" + dep + "'"
             try:
+                print(command)
                 cur.execute(command)
-            except Exception as e:
-                print("[ERROR] Could not insert data into database: " + str(e))
+                conn.commit()
+            except sqlite3.Error as er:
+                print('SQLite error: %s' % (' '.join(er.args)))
+                print("Exception class is: ", er.__class__)
+                print('SQLite traceback: ')
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                print(traceback.format_exception(exc_type, exc_value, exc_tb))
         else:
             print("[INFO] Updating " + dep + " in database...")
             command = "INSERT INTO " + table_name + " (name, votes, eligible, date_generated) VALUES ('" + dep + "', " + str(deps[dep][0]) + ", " + str(deps[dep][1]) + ", '" + date_generated + "')"
             try:
+                print(command)
                 cur.execute(command)
-            except Exception as e:
-                print("[ERROR] Could not insert data into database: " + str(e))
+                conn.commit()
+            except sqlite3.Error as er:
+                print('SQLite error: %s' % (' '.join(er.args)))
+                print("Exception class is: ", er.__class__)
+                print('SQLite traceback: ')
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                print(traceback.format_exception(exc_type, exc_value, exc_tb))
 
 
 
@@ -56,7 +70,7 @@ def save_to_db(data, date_generated):
     for dataset in data["Groups"]:
         if "Department" in dataset["Name"]:
             table_name = "department_data"
-            put_specific_data_into_db(dataset, table_name, date_generated, cur)
+            put_specific_data_into_db(dataset, table_name, date_generated, cur, conn)
 
 
         elif "Year of study" in dataset["Name"]:
