@@ -13,15 +13,18 @@ def put_specific_data_into_db(dataset, table_name, date_generated, cur, conn):
     
     cur.execute("SELECT * FROM " + table_name)
 
-    print("Current data in database: ")
+    column_command = "ALTER TABLE " + table_name + " ADD COLUMN '" + date_generated + "' INTEGER"
+    cur.execute(column_command)
+    conn.commit()
 
     for dep in deps:
         if dep not in deps_in_db:
             print("[INFO] Inserting " + dep + " into database...")
-            command = "INSERT INTO " + table_name + " (name, votes, eligible, date_generated) VALUES ('" + dep + "', " + str(deps[dep][0]) + ", " + str(deps[dep][1]) + ", '" + date_generated + "')"
+            row_command = "INSERT INTO " + table_name + " (name, eligible) VALUES ('" + dep + "', " + str(deps[dep][1]) + ")"
+            input_data_command = "UPDATE " + table_name + " SET '" + date_generated + "' = " + str(deps[dep][0]) + " WHERE name = '" + dep + "'"
             try:
-                print(f"{command!r}")
-                cur.execute(command)
+                cur.execute(row_command)
+                cur.execute(input_data_command)
                 conn.commit()
             except sqlite3.Error as er:
                 print('SQLite error: %s' % (' '.join(er.args)))
@@ -31,10 +34,9 @@ def put_specific_data_into_db(dataset, table_name, date_generated, cur, conn):
                 print(traceback.format_exception(exc_type, exc_value, exc_tb))
         else:
             print("[INFO] Updating " + dep + " in database...")
-            command = "UPDATE " + table_name + " SET votes = " + str(deps[dep][0]) + ", eligible = " + str(deps[dep][1]) + ", date_generated = '" + date_generated + "' WHERE name = '" + dep + "'"
+            input_data_command = "UPDATE " + table_name + " SET '" + date_generated + "' = " + str(deps[dep][0]) + " WHERE name = '" + dep + "'"
             try:
-                print(f"{command!r}")
-                cur.execute(command)
+                cur.execute(input_data_command)
                 conn.commit()
             except sqlite3.Error as er:
                 print('SQLite error: %s' % (' '.join(er.args)))
@@ -64,7 +66,7 @@ def save_to_db(data, date_generated):
 
         if cur.fetchone() is None:
             print("[ERROR] Table " + table + " does not exist. Creating it now...")
-            cur.execute("CREATE TABLE " + table + " (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, votes INTEGER, eligible INTEGER, date_generated TEXT)")            
+            cur.execute("CREATE TABLE " + table + " (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, eligible INTEGER)")            
 
 
     for dataset in data["Groups"]:

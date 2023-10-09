@@ -18,4 +18,6 @@ print(cur.fetchall())
 
 cur.execute("SELECT * FROM department_data")
 
+print([description[0] for description in cur.description])
+
 print(cur.fetchall())
