@@ -16,8 +16,8 @@ cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
 
 print(cur.fetchall())
 
-cur.execute("SELECT * FROM department_data")
-
-print([description[0] for description in cur.description])
-
-print(cur.fetchall())
+for table in tables:
+    cur.execute("SELECT * FROM " + table)
+    print([description[0] for description in cur.description])
+    print(cur.fetchall())
+    

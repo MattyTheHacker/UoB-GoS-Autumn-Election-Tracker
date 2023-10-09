@@ -77,21 +77,21 @@ def save_to_db(data, date_generated):
 
         elif "Year of study" in dataset["Name"]:
             table_name = "year_data"
-            pass
+            put_specific_data_into_db(dataset, table_name, date_generated, cur, conn)
 
 
 
 
         elif "Student type" in dataset["Name"]:
             table_name = "type_data"
-            pass
+            put_specific_data_into_db(dataset, table_name, date_generated, cur, conn)
 
 
 
 
         elif "Sex" in dataset["Name"]:
             table_name = "sex_data"
-            pass
+            put_specific_data_into_db(dataset, table_name, date_generated, cur, conn)
 
 
     conn.commit()
