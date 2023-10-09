@@ -15,3 +15,7 @@ tables = [table[0] for table in cur.fetchall()]
 cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
 
 print(cur.fetchall())
+
+cur.execute("SELECT * FROM department_data")
+
+print(cur.fetchall())

@@ -18,9 +18,9 @@ def put_specific_data_into_db(dataset, table_name, date_generated, cur, conn):
     for dep in deps:
         if dep not in deps_in_db:
             print("[INFO] Inserting " + dep + " into database...")
-            command = "UPDATE " + table_name + " SET votes = " + str(deps[dep][0]) + ", eligible = " + str(deps[dep][1]) + ", date_generated = '" + date_generated + "' WHERE name = '" + dep + "'"
+            command = "INSERT INTO " + table_name + " (name, votes, eligible, date_generated) VALUES ('" + dep + "', " + str(deps[dep][0]) + ", " + str(deps[dep][1]) + ", '" + date_generated + "')"
             try:
-                print(command)
+                print(f"{command!r}")
                 cur.execute(command)
                 conn.commit()
             except sqlite3.Error as er:
@@ -31,9 +31,9 @@ def put_specific_data_into_db(dataset, table_name, date_generated, cur, conn):
                 print(traceback.format_exception(exc_type, exc_value, exc_tb))
         else:
             print("[INFO] Updating " + dep + " in database...")
-            command = "INSERT INTO " + table_name + " (name, votes, eligible, date_generated) VALUES ('" + dep + "', " + str(deps[dep][0]) + ", " + str(deps[dep][1]) + ", '" + date_generated + "')"
+            command = "UPDATE " + table_name + " SET votes = " + str(deps[dep][0]) + ", eligible = " + str(deps[dep][1]) + ", date_generated = '" + date_generated + "' WHERE name = '" + dep + "'"
             try:
-                print(command)
+                print(f"{command!r}")
                 cur.execute(command)
                 conn.commit()
             except sqlite3.Error as er:
