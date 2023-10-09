@@ -1,9 +1,39 @@
 import sqlite3
 import os
 
+def put_specific_data_into_db(dataset, table_name, date_generated, cur):
+    cur.execute("SELECT name FROM " + table_name)
+    deps_in_db = [dep[0] for dep in cur.fetchall()]
+
+    deps = {}
+    for dep in dataset["Items"]:
+        deps[dep["Name"]] = (dep["Voters"], dep["Eligible"])
+    
+    cur.execute("SELECT * FROM " + table_name)
+
+    print("Current data in database: ")
+
+    for dep in deps:
+        if dep not in deps_in_db:
+            print("[INFO] Inserting " + dep + " into database...")
+            command = "UPDATE " + table_name + " SET votes = " + str(deps[dep][0]) + ", eligible = " + str(deps[dep][1]) + ", date_generated = '" + date_generated + "' WHERE name = '" + dep + "'"
+            try:
+                cur.execute(command)
+            except Exception as e:
+                print("[ERROR] Could not insert data into database: " + str(e))
+        else:
+            print("[INFO] Updating " + dep + " in database...")
+            command = "INSERT INTO " + table_name + " (name, votes, eligible, date_generated) VALUES ('" + dep + "', " + str(deps[dep][0]) + ", " + str(deps[dep][1]) + ", '" + date_generated + "')"
+            try:
+                cur.execute(command)
+            except Exception as e:
+                print("[ERROR] Could not insert data into database: " + str(e))
+
+
+
 def save_to_db(data, date_generated):
     # we're going to have a separate table for different sets of data:
-    # societies, departments, year, type (UG, PGR, PGT)
+    # departments, year, type (UG, PGR, PGT) etc...
 
     db_file_path = "../data/db/all_data.db"
 
@@ -26,34 +56,7 @@ def save_to_db(data, date_generated):
     for dataset in data["Groups"]:
         if "Department" in dataset["Name"]:
             table_name = "department_data"
-
-            cur.execute("SELECT name FROM " + table_name)
-            deps_in_db = [dep[0] for dep in cur.fetchall()]
-
-            deps = {}
-            for dep in dataset["Items"]:
-                deps[dep["Name"]] = (dep["Voters"], dep["Eligible"])
-            
-            cur.execute("SELECT * FROM " + table_name)
-
-            print("Current data in database: ")
-
-            for dep in deps:
-                if dep not in deps_in_db:
-                    print("[INFO] Inserting " + dep + " into database...")
-                    command = "UPDATE " + table_name + " SET votes = " + str(deps[dep][0]) + ", eligible = " + str(deps[dep][1]) + ", date_generated = '" + date_generated + "' WHERE name = '" + dep + "'"
-                    print(command)
-                    try:
-                        cur.execute(command)
-                    except Exception as e:
-                        print("[ERROR] Could not insert data into database: " + str(e))
-                else:
-                    print("[INFO] Updating " + dep + " in database...")
-                    command = "INSERT INTO " + table_name + " (name, votes, eligible, date_generated) VALUES ('" + dep + "', " + str(deps[dep][0]) + ", " + str(deps[dep][1]) + ", '" + date_generated + "')"
-                    try:
-                        cur.execute(command)
-                    except Exception as e:
-                        print("[ERROR] Could not insert data into database: " + str(e))
+            put_specific_data_into_db(dataset, table_name, date_generated, cur)
 
 
         elif "Year of study" in dataset["Name"]:
