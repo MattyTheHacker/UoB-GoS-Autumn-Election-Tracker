@@ -9,6 +9,7 @@ def save_to_db(data, date_generated):
 
     if not os.path.exists(db_file_path):
         print("[ERROR] Database file does not exist.")
+        exit()
 
     conn = sqlite3.connect(db_file_path)
     cur = conn.cursor()

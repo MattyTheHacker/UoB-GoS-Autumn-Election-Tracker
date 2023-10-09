@@ -47,7 +47,21 @@ def convert_generated_dt_to_object(generated_dt):
 
 
 def get_all_election_data():
-    election_url = "https://www.guildofstudents.com/svc/voting/stats/election/paramstats/169?groupIds=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20&sortBy=itemname&sortDirection=ascending"
+
+    """
+    IDs:
+    1 - AGE
+    2 - Data source
+    3 - Fee status
+    4 - Mode of Study
+    5 - Residency
+    6 - Sex
+    7 - Student Type (UG, PGT, PGR)
+    8 - Year of Study
+    9 - Department
+    """
+
+    election_url = "https://www.guildofstudents.com/svc/voting/stats/election/paramstats/169?groupIds=1,5,6,7,8,9&sortBy=itemname&sortDirection=ascending"
 
     data = get_data(election_url)
 
