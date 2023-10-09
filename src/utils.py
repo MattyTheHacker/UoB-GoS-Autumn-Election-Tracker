@@ -61,7 +61,7 @@ def get_all_election_data():
     9 - Department
     """
 
-    election_url = "https://www.guildofstudents.com/svc/voting/stats/election/paramstats/169?groupIds=1,5,6,7,8,9&sortBy=itemname&sortDirection=ascending"
+    election_url = "https://www.guildofstudents.com/svc/voting/stats/election/paramstats/169?groupIds=1,6,7,8,9&sortBy=itemname&sortDirection=ascending"
 
     data = get_data(election_url)
 
